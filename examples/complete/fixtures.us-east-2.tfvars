@@ -80,3 +80,5 @@ container_port_mappings = [
 
 force_new_deployment = true
 redeploy_on_apply    = true
+
+ecs_service_name = []

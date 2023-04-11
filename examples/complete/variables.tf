@@ -138,3 +138,12 @@ variable "redeploy_on_apply" {
   description = "Updates the service to the latest task definition on each apply"
   default     = false
 }
+
+variable "ecs_service_name" {
+  type        = list(string)
+  description = <<-EOT
+    If string is not null, use the string as the name of the ECS service. 
+    Otherwise a name will be generated.
+    EOT
+  default     = []
+}

@@ -498,10 +498,10 @@ variable "ecs_service_enabled" {
 }
 
 variable "ecs_service_name" {
-  type        = string
+  type        = list(string)
   description = <<-EOT
     If string is not null, use the string as the name of the ECS service. 
     Otherwise a name will be generated.
     EOT
-  default     = null
+  default     = []
 }
