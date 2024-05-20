@@ -19,6 +19,12 @@ locals {
   task_policy_arns_map = merge({ for i, a in var.task_policy_arns : format("_#%v_", i) => a }, var.task_policy_arns_map)
 
   task_exec_policy_arns_map = merge({ for i, a in var.task_exec_policy_arns : format("_#%v_", i) => a }, var.task_exec_policy_arns_map)
+
+  task_definition = local.create_task_definition ? join(":", [
+    join("", aws_ecs_task_definition.default[*].family),
+    var.task_definition_family_only ? "" : join("", aws_ecs_task_definition.default[*].revision)
+    ]
+  ) : var.task_definition[0]
 }
 
 module "task_label" {
@@ -401,7 +407,7 @@ resource "aws_security_group_rule" "nlb" {
 resource "aws_ecs_service" "ignore_changes_task_definition" {
   count                              = local.ecs_service_enabled && var.ignore_changes_task_definition && !var.ignore_changes_desired_count ? 1 : 0
   name                               = module.this.id
-  task_definition                    = local.create_task_definition ? "${join("", aws_ecs_task_definition.default[*].family)}:${join("", aws_ecs_task_definition.default[*].revision)}" : var.task_definition[0]
+  task_definition                    = local.task_definition
   desired_count                      = var.desired_count
   deployment_maximum_percent         = var.deployment_maximum_percent
   deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
@@ -554,7 +560,7 @@ resource "aws_ecs_service" "ignore_changes_task_definition" {
 resource "aws_ecs_service" "ignore_changes_task_definition_and_desired_count" {
   count                              = local.ecs_service_enabled && var.ignore_changes_task_definition && var.ignore_changes_desired_count ? 1 : 0
   name                               = module.this.id
-  task_definition                    = local.create_task_definition ? "${join("", aws_ecs_task_definition.default[*].family)}:${join("", aws_ecs_task_definition.default[*].revision)}" : var.task_definition[0]
+  task_definition                    = local.task_definition
   desired_count                      = var.desired_count
   deployment_maximum_percent         = var.deployment_maximum_percent
   deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
@@ -707,7 +713,7 @@ resource "aws_ecs_service" "ignore_changes_task_definition_and_desired_count" {
 resource "aws_ecs_service" "ignore_changes_desired_count" {
   count                              = local.ecs_service_enabled && !var.ignore_changes_task_definition && var.ignore_changes_desired_count ? 1 : 0
   name                               = module.this.id
-  task_definition                    = local.create_task_definition ? "${join("", aws_ecs_task_definition.default[*].family)}:${join("", aws_ecs_task_definition.default[*].revision)}" : var.task_definition[0]
+  task_definition                    = local.task_definition
   desired_count                      = var.desired_count
   deployment_maximum_percent         = var.deployment_maximum_percent
   deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
@@ -860,7 +866,7 @@ resource "aws_ecs_service" "ignore_changes_desired_count" {
 resource "aws_ecs_service" "default" {
   count                              = local.ecs_service_enabled && !var.ignore_changes_task_definition && !var.ignore_changes_desired_count ? 1 : 0
   name                               = module.this.id
-  task_definition                    = local.create_task_definition ? "${join("", aws_ecs_task_definition.default[*].family)}:${join("", aws_ecs_task_definition.default[*].revision)}" : var.task_definition[0]
+  task_definition                    = local.task_definition
   desired_count                      = var.desired_count
   deployment_maximum_percent         = var.deployment_maximum_percent
   deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent

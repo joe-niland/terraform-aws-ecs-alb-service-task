@@ -489,6 +489,12 @@ variable "task_definition" {
   default     = []
 }
 
+variable "task_definition_family_only" {
+  type        = bool
+  description = "When using the task definition created by this module, ignore the revision number when referencing the task definition in a service"
+  default     = false
+}
+
 variable "force_new_deployment" {
   type        = bool
   description = "Enable to force a new task deployment of the service."
